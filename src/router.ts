@@ -9,6 +9,7 @@ module.exports = function (app) {
   app.delete('/folder/:_id', Folder.delete)
 
   app.get('/project', Project.get)
+  app.get('/project/:_id', Project.getSingle)
   app.post('/project', Project.post)
   app.patch('/project/:_id', Project.patch)
   app.delete('/project/:_id', Project.delete)

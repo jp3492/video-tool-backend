@@ -13,7 +13,11 @@ const Project = new Schema({
   folder: {
     type: Schema.Types.ObjectId,
     ref: 'folder'
-  }
+  },
+  links: [{
+    url: String,
+    label: String
+  }]
 }, { timestamps: true })
 
 const ModelClass = mongoose.model('project', Project)

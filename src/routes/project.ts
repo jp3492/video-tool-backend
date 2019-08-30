@@ -9,6 +9,15 @@ const get = async (req, res) => {
   }
 }
 
+const getSingle = async (req, res) => {
+  try {
+    const project = await Project.findById(req.params._id)
+    res.status(200).send(project)
+  } catch (error) {
+    res.status(400).send(error)
+  }
+}
+
 const post = async (req, res) => {
   try {
     const newProject = new Project(req.body)
@@ -20,16 +29,15 @@ const post = async (req, res) => {
 }
 
 const patch = async (req, res) => {
-  const {
-    _id,
-    ...updatedProperties
-  } = req.body
+  const { _id } = req.params
+  console.log(_id, req.body);
+
   try {
     const updatedProject = await Project.findOneAndUpdate({
       _id
     }, {
-        ...updatedProperties
-      })
+        ...req.body
+      }, { new: true })
     res.status(200).send(updatedProject)
   } catch (error) {
     res.status(400).send(error)
@@ -48,6 +56,7 @@ const remove = async (req, res) => {
 
 module.exports = {
   get,
+  getSingle,
   post,
   patch,
   delete: remove,
