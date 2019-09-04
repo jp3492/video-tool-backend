@@ -17,6 +17,10 @@ const Project = new Schema({
   links: [{
     url: String,
     label: String
+  }],
+  tags: [{
+    type: Schema.Types.ObjectId,
+    ref: 'tag'
   }]
 }, { timestamps: true })
 
