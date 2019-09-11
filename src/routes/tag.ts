@@ -3,9 +3,13 @@ const Project = require('../models/project')
 
 const get = async (req, res) => {
   try {
-    const { _id } = req.params
-    const project = await Project.findById(_id)
-    const projectTags = project.tags
+    const { ids } = req.params
+    console.log(ids);
+
+    const projects = await Project.find({ _id: { $in: JSON.parse(ids) } })
+    const projectTags = projects.reduce((res, p) => ([...res, ...p.tags]), [])
+    console.log(projectTags);
+
     const tags = await Tag.find({ _id: { $in: projectTags } })
     res.status(200).send({ items: tags })
   } catch (error) {

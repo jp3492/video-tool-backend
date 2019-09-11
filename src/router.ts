@@ -14,8 +14,9 @@ module.exports = function (app) {
   app.post('/project', Project.post)
   app.patch('/project/:_id', Project.patch)
   app.delete('/project/:_id', Project.delete)
+  app.get('/projects/:ids', Project.getMany)
 
-  app.get('/tag/:_id', Tag.get)
+  app.get('/tag/:ids', Tag.get)
   app.post('/tag/:_id', Tag.post)
 
   app.get('/user', User.get)

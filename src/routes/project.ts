@@ -18,8 +18,19 @@ const getSingle = async (req, res) => {
   }
 }
 
+const getMany = async (req, res) => {
+  try {
+    const projects = await Project.find({ _id: { $in: JSON.parse(req.params.ids) } })
+    res.status(200).send({ items: projects })
+  } catch (error) {
+    res.status(400).send(error)
+  }
+}
+
 const post = async (req, res) => {
   try {
+    console.log(req.body);
+
     const newProject = new Project(req.body)
     await newProject.save()
     res.status(200).send(newProject)
@@ -36,8 +47,8 @@ const patch = async (req, res) => {
     const updatedProject = await Project.findOneAndUpdate({
       _id
     }, {
-        ...req.body
-      }, { new: true })
+      ...req.body
+    }, { new: true })
     res.status(200).send(updatedProject)
   } catch (error) {
     res.status(400).send(error)
@@ -60,4 +71,5 @@ module.exports = {
   post,
   patch,
   delete: remove,
+  getMany
 }
