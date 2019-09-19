@@ -18,6 +18,7 @@ module.exports = function (app) {
 
   app.get('/tag/:ids', Tag.get)
   app.post('/tag/:_id', Tag.post)
+  app.patch('/tag/:_id', Tag.patch)
 
   app.get('/user', User.get)
   app.get('/user/:_id', User.getSingle)

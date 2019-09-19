@@ -29,6 +29,24 @@ const post = async (req, res) => {
   }
 }
 
+const patch = async (req, res) => {
+  try {
+    const { _id } = req.params
+    const updatedTag = await Tag.findOneAndUpdate({ _id }, { ...req.body }, { new: true })
+    res.status(200).send(updatedTag)
+  } catch (error) {
+    res.status(400).send(error)
+  }
+}
+
+// const remove = async (req, res) => {
+//   try {
+//     const { projectId, tagIds }
+//   } catch (error) {
+
+//   }
+// }
+
 // const patch = async (req, res) => {
 //   const { _id } = req.params
 //   try {
@@ -56,6 +74,6 @@ const post = async (req, res) => {
 module.exports = {
   get,
   post,
-  // patch,
+  patch,
   // delete: remove,
 }

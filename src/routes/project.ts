@@ -1,4 +1,5 @@
 const Project = require('../models/project')
+const Tag = require('../models/tag')
 
 const get = async (req, res) => {
   try {
@@ -29,8 +30,6 @@ const getMany = async (req, res) => {
 
 const post = async (req, res) => {
   try {
-    console.log(req.body);
-
     const newProject = new Project(req.body)
     await newProject.save()
     res.status(200).send(newProject)
@@ -41,13 +40,25 @@ const post = async (req, res) => {
 
 const patch = async (req, res) => {
   const { _id } = req.params
-  console.log(_id, req.body);
-
+  // get project
+  //  get according tags
+  // filter tags
+  // update project 
   try {
+    const links = req.body.links.map(l => l.url)
+    console.log(links);
+
+    const tags = await Tag.find({ _id: { $in: req.body.tags } })
+    console.log(tags);
+
+    const filteredTags = tags.filter(({ url }) => links.includes(url))
+    console.log(filteredTags);
+
     const updatedProject = await Project.findOneAndUpdate({
       _id
     }, {
-      ...req.body
+      ...req.body,
+      tags: filteredTags.map(({ _id }) => _id)
     }, { new: true })
     res.status(200).send(updatedProject)
   } catch (error) {
