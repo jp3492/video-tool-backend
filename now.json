@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "src/index.js",
+      "use": "@now/node-server"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/*",
+      "dest": "/src/index.js",
+      "methods": [
+        "GET",
+        "POST",
+        "PATCH",
+        "OPTIONS",
+        "DELETE"
+      ]
+    }
+  ]
+}
