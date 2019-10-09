@@ -8,8 +8,7 @@ const targets = async (option, search) => {
     case "user": return await User.find({ email: { $regex: search, $options: 'i' } })
     case "project": return await Project.find({ label: { $regex: search, $options: 'i' } })
     case "tag": return await Tag.find({ text: { $regex: search, $options: 'i' } })
-    default:
-      break;
+    default: return []
   }
 }
 

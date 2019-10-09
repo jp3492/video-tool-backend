@@ -11,7 +11,7 @@ const get = async (req, res) => {
 
 const post = async (req, res) => {
   try {
-    const newRequest = new Request(req.body)
+    const newRequest = new Request({ ...req.body, from: req.user })
     await newRequest.save()
     res.status(200).send(newRequest)
   } catch (error) {
@@ -20,18 +20,14 @@ const post = async (req, res) => {
 }
 
 const patch = async (req, res) => {
-  const {
-    _id,
-    accepted
-  } = req.body
+  const { accepted } = req.body
+  const { _id } = req.params
   try {
     if (accepted) {
-      const request = await Request.findById(_id)
+      const request = await Request.findOneAndUpdate({ _id }, { status: accepted ? "ACCEPTED" : "REJECTED" }, { new: true })
       await User.findOneAndUpate({ _id: request.from }, { $push: { connections: request.to } })
       await User.findOneAndUpate({ _id: request.to }, { $push: { connections: request.from } })
-      await Request.remove({ _id })
-      res.status(200)
-      res.send("Successful connected")
+      res.status(200).send(request)
     } else {
       await Request.remove({ _id })
       res.status(200)

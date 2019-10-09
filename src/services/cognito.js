@@ -31,8 +31,8 @@ module.exports = async (req, res, next) => {
     return res.send({ message: "You shall not pass - 'Gandalf'(long time ago)" })
   } else {
     try {
-      // const user = await User.findOne({ cognitoId: cognitoid })
-      req.user = identity
+      const user = await User.findOne({ cognitoId: identity })
+      req.user = user._id
       next()
     } catch (error) {
       res.status(404)

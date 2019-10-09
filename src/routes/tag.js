@@ -1,15 +1,29 @@
 const Tag = require('../models/tag')
 const Project = require('../models/project')
 
+const getAll = async (req, res) => {
+  try {
+    const projects = await Project.find({ userId: req.user })
+    const links = projects.reduce((res, p) => {
+      const newLinks = p.links.filter(l => !res.includes(l.url))
+      return [...res, ...newLinks]
+    }, [])
+    const tagIds = projects.reduce((res, p) => {
+      return [...res, ...p.tags]
+    }, [])
+    const tags = await Tag.find({ _id: { $in: tagIds } })
+    res.status(200).send({ items: tags.map(t => ({ ...t._doc, videoName: links.find(l => l.url === t.url).label })) })
+  } catch (error) {
+    console.error(error)
+    res.status(400).send(error)
+  }
+}
+
 const get = async (req, res) => {
   try {
     const { ids } = req.params
-    console.log(ids);
-
     const projects = await Project.find({ _id: { $in: JSON.parse(ids) } })
     const projectTags = projects.reduce((res, p) => ([...res, ...p.tags]), [])
-    console.log(projectTags);
-
     const tags = await Tag.find({ _id: { $in: projectTags } })
     res.status(200).send({ items: tags })
   } catch (error) {
@@ -75,5 +89,6 @@ module.exports = {
   get,
   post,
   patch,
+  getAll,
   // delete: remove,
 }

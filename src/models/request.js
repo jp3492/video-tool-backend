@@ -21,6 +21,12 @@ const Request = new Schema({
     type: String,
     required: true,
     enum: ["project", "folder", "user"]
+  },
+  status: {
+    type: String,
+    required: true,
+    enum: ["PENDING", "ACCEPTED", "REJECTED"],
+    default: "PENDING"
   }
 }, { timestamps: true })
 

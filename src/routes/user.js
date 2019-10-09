@@ -13,8 +13,6 @@ const getSingle = async (req, res) => {
   const { cognitoId } = req.params
   try {
     const user = await User.findOne({ cognitoId })
-    console.log(cognitoId, user);
-
     res.status(200).send(user)
   } catch (error) {
     res.status(400).send(error)
