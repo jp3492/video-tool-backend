@@ -1,10 +1,15 @@
 const Request = require('../models/request')
+const User = require('../models/user')
 
 const get = async (req, res) => {
   try {
     const requests = await Request.find({ $or: [{ from: req.user }, { to: req.user }] })
-    res.status(200).send({ items: requests })
+    const userIds = requests.reduce((res, r) => res.includes(r.from === req.user ? r.to : r.from) ? res : [...res, r.from === req.user ? r.to : r.from], [])
+    const user = await User.find({ _id: { $in: userIds } })
+    const expandedRequests = requests.map(r => ({ ...r._doc, fromMe: r.from === req.user, userEmail: user.find(u => u._id === (r.from === req.user ? r.to : r.from)) }))
+    res.status(200).send({ items: expandedRequests })
   } catch (error) {
+    console.error(error)
     res.status(400).send(error)
   }
 }

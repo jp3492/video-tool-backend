@@ -1,14 +1,33 @@
-const mongoose = require('mongoose')
-const Schema = mongoose.Schema
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-const Tag = new Schema({
-  text: String,
-  start: Number,
-  end: Number,
-  url: String,
-  author: String
-}, { timestamps: true })
+const Comment = new Schema(
+  {
+    author: {
+      type: Schema.Types.ObjectId,
+      ref: 'user',
+      required: true
+    },
+    text: {
+      type: String,
+      required: true
+    }
+  },
+  { timestamps: true }
+);
 
-const ModelClass = mongoose.model('tag', Tag)
+const Tag = new Schema(
+  {
+    text: String,
+    start: Number,
+    end: Number,
+    url: String,
+    author: String,
+    comments: [Comment]
+  },
+  { timestamps: true }
+);
 
-module.exports = ModelClass
+const ModelClass = mongoose.model('tag', Tag);
+
+module.exports = ModelClass;
