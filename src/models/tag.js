@@ -23,7 +23,10 @@ const Tag = new Schema(
     end: Number,
     url: String,
     author: String,
-    comments: [Comment]
+    comments: {
+      type: [Comment],
+      default: []
+    }
   },
   { timestamps: true }
 );

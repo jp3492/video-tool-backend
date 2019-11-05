@@ -30,14 +30,13 @@ const post = async (req, res) => {
 };
 
 const patch = async (req, res) => {
-  const { _id, ...updatedProperties } = req.body;
   try {
     const updatedUser = await User.findOneAndUpdate(
       {
-        _id
+        _id: req.user
       },
       {
-        ...updatedProperties
+        information: req.body
       },
       { new: true }
     );

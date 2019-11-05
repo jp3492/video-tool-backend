@@ -1,29 +1,14 @@
 const Tag = require('../models/tag');
 const Project = require('../models/project');
+const User = require('../models/user');
 
 const deleteComment = async (req, res) => {
   try {
     const { tagId, commentId } = req.params;
-    console.log(req.params);
-    const tagBefore = await Tag.findById(tagId);
-    console.log(tagBefore);
-    const updatedTag = await Tag.findOneAndUpdate(
-      {
-        _id: tagId
-      },
-      {
-        comments: {
-          $pull: {
-            _id: commentId
-          }
-        }
-      },
-      {
-        new: true
-      }
-    );
-    console.log(updatedTag);
-    res.status(200).send(updatedTag);
+    let thisTag = await Tag.findById(tagId);
+    thisTag.comments.pull(commentId);
+    await thisTag.save();
+    res.status(200).send(thisTag);
   } catch (error) {
     console.error(error);
     res.status(400).send(error);
@@ -58,7 +43,6 @@ const postComment = async (req, res) => {
   try {
     const { _id } = req.params;
     const { text } = req.body;
-
     const updatedTag = await Tag.findOneAndUpdate(
       {
         _id
@@ -75,8 +59,36 @@ const postComment = async (req, res) => {
         new: true
       }
     );
-    res.status(200).send(updatedTag);
-  } catch (error) {}
+    const commentUsers = updatedTag.comments.reduce((re, c) => {
+      if (!re.includes(c.author)) {
+        return [...re, c.author];
+      } else {
+        return re;
+      }
+    }, []);
+
+    const users = await User.find({ _id: { $in: commentUsers } });
+    const namesAdded = updatedTag.comments.map(c => {
+      const user = users.find(u => String(u._id) === String(c.author));
+      const name =
+        user.information.firstName || user.information.lastName
+          ? `${user.information.firstName}${
+              user.information.firstName && user.information.lastName ? ',' : ''
+            }${user.information.lastName}`
+          : user.email;
+      return {
+        ...c._doc,
+        name
+      };
+    });
+    res.status(200).send({
+      ...updatedTag._doc,
+      comments: namesAdded
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(400).send(error);
+  }
 };
 
 const getAll = async (req, res) => {
@@ -108,8 +120,40 @@ const get = async (req, res) => {
     const projects = await Project.find({ _id: { $in: JSON.parse(ids) } });
     const projectTags = projects.reduce((res, p) => [...res, ...p.tags], []);
     const tags = await Tag.find({ _id: { $in: projectTags } });
-    res.status(200).send({ items: tags });
+    const commentUsers = tags.reduce((res, t) => {
+      return [
+        ...res,
+        ...t.comments.reduce((re, c) => {
+          if (!res.includes(c.author) && !re.includes(c.author)) {
+            return [...re, c.author];
+          } else {
+            return re;
+          }
+        }, [])
+      ];
+    }, []);
+    const users = await User.find({ _id: { $in: commentUsers } });
+    const namesAdded = tags.map(t => ({
+      ...t._doc,
+      comments: t.comments.map(c => {
+        const user = users.find(u => String(u._id) === String(c.author));
+        const name =
+          user.information.firstName || user.information.lastName
+            ? `${user.information.firstName}${
+                user.information.firstName && user.information.lastName
+                  ? ','
+                  : ''
+              }${user.information.lastName}`
+            : user.email;
+        return {
+          ...c._doc,
+          name
+        };
+      })
+    }));
+    res.status(200).send({ items: namesAdded });
   } catch (error) {
+    console.error(error);
     res.status(400).send(error);
   }
 };
@@ -122,6 +166,7 @@ const post = async (req, res) => {
     await Project.findOneAndUpdate({ _id }, { $push: { tags: newTag._id } });
     res.status(200).send(newTag);
   } catch (error) {
+    console.error(error);
     res.status(400).send(error);
   }
 };
@@ -136,6 +181,7 @@ const patch = async (req, res) => {
     );
     res.status(200).send(updatedTag);
   } catch (error) {
+    console.error(error);
     res.status(400).send(error);
   }
 };

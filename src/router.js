@@ -32,7 +32,7 @@ module.exports = function(app) {
   app.get('/user', auth, User.get);
   app.get('/user/:cognitoId', auth, User.getSingle);
   app.post('/user', User.post);
-  app.patch('/user/:_id', auth, User.patch);
+  app.patch('/user', auth, User.patch);
   app.delete('/user/:_id', auth, User.delete);
 
   app.post('/search', Search.post);
